@@ -18,7 +18,7 @@ namespace WebApplication1.Controllers
 
         public IActionResult Index()
         {
-            return new JsonResult(_context.students.ToList());
+            return View(_context.students.ToList());
         }
 
         public IActionResult Create()
@@ -31,7 +31,48 @@ namespace WebApplication1.Controllers
         {
             _context.students.Add(student);
             _context.SaveChanges();
-            return new JsonResult(student);
+            TempData["message"] = "Insert success";
+            return Redirect("Index");
+        }
+        
+        public IActionResult Edit(long id)
+        {
+            var existStudent = _context.students.Find(id);
+            if (existStudent == null)
+            {
+                return NotFound();
+            }
+            return View(existStudent);
+        }
+
+        public IActionResult Update(Student student)
+        {
+            var existStudent = _context.students.Find(student.Id);
+            if (existStudent == null)
+            {
+                return NotFound();
+            }
+            existStudent.Name = student.Name;
+            existStudent.RollNumber = student.RollNumber;
+            _context.students.Update(existStudent);
+            _context.SaveChanges();
+            TempData["message"] = "Update success!";
+            return Redirect("Index");
+        }
+
+        [HttpDelete]
+        public IActionResult Delete(long id)
+        {
+            var existStudent = _context.students.Find(id);
+            if (existStudent == null)
+            {
+                return NotFound();
+            }
+            _context.students.Remove(existStudent);
+            _context.SaveChanges();
+            TempData["message"] = "Delete success!";
+
+            return Json(existStudent);
         }
     }
 }
